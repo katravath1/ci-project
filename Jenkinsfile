@@ -75,15 +75,4 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            cleanWs()
-        }
-        success {
-            echo 'Build and analysis passed successfully!'
-        }
-        failure {
-            echo 'Build or analysis failed. Please check the logs for details.'
-        }
-    }
 }
