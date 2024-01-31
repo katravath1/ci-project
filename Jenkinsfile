@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     // Add any specific environment setup or checks here
-                    sh 'mvn -s settings.xml -DskipTests install -u'
+                    sh 'mvn -s settings.xml install -u'
                 }
             }
         }
