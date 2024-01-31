@@ -27,5 +27,15 @@ pipeline {
                 }
             }
         }
+        stage('Junit test for the code'){
+            steps {
+                sh 'mvn clean compile test'
+            }
+        }
+        stage ('check style analysis of the code') {
+            steps {
+                sh 'mvn checkstyle:checkstyle'
+            }
+        }
     }
 }
