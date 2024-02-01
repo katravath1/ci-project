@@ -17,6 +17,12 @@ pipeline {
         NEXUS_GRP_REPO = 'vpro-maven-group'
         NEXUS_LOGIN = 'nexuslogin'
         SONARQUBE_SCANNER_HOME = tool 'sonarscanner'
+        NEXUS_CREDENTIALS_ID = 'nexuslogin'
+        NEXUS_REPO_URL = 'http://172.31.87.232:8081/repository/vprofile-release'
+        ARTIFACT_FILE = '/var/lib/jenkins/workspace/ci-jenkins/target/vprofile-v2.war'
+        GROUP_ID = 'vpro-maven-group'
+        ARTIFACT_ID = 'spring-test'
+        VERSION = '1.0.0'
     }
 
     stages {
@@ -77,6 +83,22 @@ pipeline {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
                     waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+        stage('publish to Nexus') {
+            steps {
+                script {
+                    def nexusArtifactUploader = nexusArtifactUploader()
+
+                    nexusArtifactUploader.credentialsId = env.NEXUS_CREDENTIALS_ID
+                    nexusArtifactUploader.repositoryUrl = env.NEXUS_REPO_URL
+                    nexusArtifactUploader.artifact = env.ARTIFACT_FILE
+                    nexusArtifactUploader.groupId = env.GROUP_ID
+                    nexusArtifactUploader.artifactId = env.ARTIFACT_ID
+                    nexusArtifactUploader.version = env.VERSION
+
+                    nexusArtifactUploader.deploy()
                 }
             }
         }
