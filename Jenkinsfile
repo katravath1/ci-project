@@ -89,16 +89,17 @@ pipeline {
         stage('publish to Nexus') {
             steps {
                 script {
-                    def nexusArtifactUploader = nexusArtifactUploader()
-
-                    nexusArtifactUploader.credentialsId = env.NEXUS_CREDENTIALS_ID
-                    nexusArtifactUploader.repositoryUrl = env.NEXUS_REPO_URL
-                    nexusArtifactUploader.artifact = env.ARTIFACT_FILE
-                    nexusArtifactUploader.groupId = env.GROUP_ID
-                    nexusArtifactUploader.artifactId = env.ARTIFACT_ID
-                    nexusArtifactUploader.version = env.VERSION
-
-                    nexusArtifactUploader.deploy()
+                    def server = Artifactory.server 'your-nexus-server'
+                    def uploadSpec = """{
+                           "files": [
+                                {
+                                    "pattern": "${env.ARTIFACT_FILE}",
+                                    "target": "vprofile-release/${env.GROUP_ID.replace('.', '/')}/${env.ARTIFACT_ID}/${env.VERSION}/${env.ARTIFACT_ID}-${env.VERSION}.war"
+                                }
+                            ]
+                     }"""
+            
+                server.upload(uploadSpec)
                 }
             }
         }
