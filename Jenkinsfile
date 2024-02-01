@@ -99,7 +99,7 @@ pipeline {
                 )
             }
         }
-        stage ('clean workspace') {
+        stage ('clean workspace in the jenkins server') {
             steps {
                 cleanWs()
             }
