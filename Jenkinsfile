@@ -86,25 +86,26 @@ pipeline {
                 }
             }
         }
-        stage('publish to Nexus') {
-            steps {
-                script {
-                   def server = Artifactory.server 'your-nexus-server'
-                    def uploadSpec = """{
-                        "files": [
-                            {
-                                "pattern": "${env.ARTIFACT_FILE}",
-                                "target": "${env.NEXUS_REPO_ID}/${env.GROUP_ID.replace('.', '/')}/${env.ARTIFACT_ID}/${env.VERSION}/${env.ARTIFACT_ID}-${env.VERSION}.war"
-                            }
-                        ]
-                    }"""
-
-                    server.upload(uploadSpec, failNoFiles: false)
-
-                    echo "Artifact uploaded to Nexus Repository: ${server.getUrl()}/${env.NEXUS_REPO_ID}/${env.GROUP_ID.replace('.', '/')}/${env.ARTIFACT_ID}/${env.VERSION}/${env.ARTIFACT_ID}-${env.VERSION}.war"
-                }
+        stage ('upload to Nexus') {
+            steps{
+                nexusArtifactUploader(
+                  nexusVersion: 'nexus3',
+                  protocol: 'http',
+                  nexusUrl: "${NEXUSIP}:${NEXUSPORT}",
+                  groupId: 'QA',
+                  version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
+                  repository: "${RELEASE_REPO}",
+                  credentialsId: "${NEXUS_LOGIN}",
+                  artifacts: [
+                    [artifactId: 'vproapp',
+                     classifier: '',
+                     file: 'target/vprofile-v2.war',
+                     type: 'war']
+                  ]
+                )
             }
         }
+        
     }
 
 }
