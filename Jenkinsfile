@@ -89,17 +89,19 @@ pipeline {
         stage('publish to Nexus') {
             steps {
                 script {
-                    def server = Artifactory.server 'your-nexus-server'
+                   def server = Artifactory.server 'your-nexus-server'
                     def uploadSpec = """{
-                           "files": [
-                                {
-                                    "pattern": "${env.ARTIFACT_FILE}",
-                                    "target": "vprofile-release/${env.GROUP_ID.replace('.', '/')}/${env.ARTIFACT_ID}/${env.VERSION}/${env.ARTIFACT_ID}-${env.VERSION}.war"
-                                }
-                            ]
-                     }"""
-            
-                server.upload(uploadSpec)
+                        "files": [
+                            {
+                                "pattern": "${env.ARTIFACT_FILE}",
+                                "target": "${env.NEXUS_REPO_ID}/${env.GROUP_ID.replace('.', '/')}/${env.ARTIFACT_ID}/${env.VERSION}/${env.ARTIFACT_ID}-${env.VERSION}.war"
+                            }
+                        ]
+                    }"""
+
+                    server.upload(uploadSpec, failNoFiles: false)
+
+                    echo "Artifact uploaded to Nexus Repository: ${server.getUrl()}/${env.NEXUS_REPO_ID}/${env.GROUP_ID.replace('.', '/')}/${env.ARTIFACT_ID}/${env.VERSION}/${env.ARTIFACT_ID}-${env.VERSION}.war"
                 }
             }
         }
